@@ -6,7 +6,7 @@
 export {}
 declare global {
   const showFailToast: typeof import('vant/es')['showFailToast']
-  const showNotify: typeof import('vant/es')['showNotify']
+  const showNotify: typeof import('vant')['showNotify']
   const showSuccessToast: typeof import('vant/es')['showSuccessToast']
   const showToast: typeof import('vant/es')['showToast']
 }

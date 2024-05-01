@@ -1,29 +1,56 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import myAxios from "../plugins/myAxios.ts";
 import {showNotify} from "vant";
 import 'vant/es/notify/style';
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
+import {TeamType} from "../models/team";
 
-const initFormData = {
-  "description": "",
-  "expireTime": "",
-  "maxNum": 2,
-  "teamName": "",
-  "password": "",
-  "status": 0,
-}
 
 const router = useRouter();
-const addTeamData = ref({...initFormData});
+const route = useRoute();
+const addTeamData = ref({});
 const showPicker = ref(false);
 const currentDate = ref([]);
-const currentTime = ref(['12', '00']);
+const currentTime = ref([]);
 const statusChecked = ref('0');
 const minDate = new Date();
+const id = route.query.id;
 
-//当currentDate选择的是今天时，限制currentTime的选择
+// 获取队伍信息
+onMounted(async () => {
+  if (id == null || id <= 0) {
+    showNotify({type: 'danger', duration: 900, message: "加载队伍失败"});
+  }
+  await myAxios.get("/team/get", {
+    params: {
+      id,
+    }
+  }).then(res => {
+    if (res.code === 20000) {
+      addTeamData.value = res.data;
+      formatTime(addTeamData);
+    } else {
+      showNotify({type: 'danger', duration: 900, message: "获取队伍信息失败"});
+    }
+  })
+});
 
+// 格式化时间
+const formatTime = (addTeamData) => {
+  if (addTeamData.value.expireTime) {
+    currentDate.value.push(new Date(addTeamData.value.expireTime).getFullYear());
+    const month = new Date(addTeamData.value.expireTime).getMonth() + 1;
+    currentDate.value.push(month < 10 ? '0' + month : month);
+    const date = new Date(addTeamData.value.expireTime).getDate();
+    currentDate.value.push(date < 10 ? '0' + date : date);
+    const hours = new Date(addTeamData.value.expireTime).getHours();
+    currentTime.value.push(hours < 10 ? '0' + hours : hours);
+    const minutes = new Date(addTeamData.value.expireTime).getMinutes();
+    currentTime.value.push(minutes < 10 ? '0' + minutes : minutes);
+    addTeamData.value.expireTime = `${currentDate.value.join('-')} ${currentTime.value.join(':')}`;
+  }
+}
 
 const onConfirm = () => {
   addTeamData.value.expireTime = `${currentDate.value.join('-')} ${currentTime.value.join(':')}`;
@@ -32,30 +59,33 @@ const onConfirm = () => {
 const onCancel = () => {
   showPicker.value = false;
 };
+
 const onSubmit = async () => {
   const postData = {...addTeamData.value, status: Number(statusChecked.value)};
-  await myAxios.post('/team/add', postData)
+  await myAxios.post('/team/update', postData)
       .then(res => {
         if (res?.code === 20000) {
-          // 提交成功
-          showNotify({type: 'success', duration: 900, message: '创建成功'});
-          router.push({
-            path: '/team',
-            replace: true,
-          });
+          showNotify({type: 'success', duration: 900, message: '更新成功'});
+          setTimeout(() => {
+            router.push({
+              path: '/team',
+              replace: true,
+            });
+          }, 1000);
         } else {
-          showNotify({type: 'danger', duration: 900, message: '创建失败'});
+          showNotify({type: 'danger', duration: 900, message: '更新失败'});
         }
         console.log(res);
       }).catch(error => {
-        showNotify({type: 'danger', duration: 900, message: '创建失败'});
-        console.error('Error add team: ', error);
+        showNotify({type: 'danger', duration: 900, message: '更新失败'});
+        console.error('Error update team: ', error);
       });
 }
+
 </script>
 
 <template>
-  <div id="addTeamPage">
+  <div id="updateTeamPage">
     <van-form @submit="onSubmit">
       <van-cell-group inset>
         <van-field
@@ -67,7 +97,7 @@ const onSubmit = async () => {
         />
         <van-field name="maxNum" label="最大人数">
           <template #input>
-            <van-stepper v-model="addTeamData.maxNum" min="2" max="20" input-width="40px" button-size="32px"/>
+            <van-stepper v-model="addTeamData.maxNum" disabled min="2" max="20" input-width="40px" button-size="32px"/>
           </template>
         </van-field>
         <van-field name="status" label="队伍状态">

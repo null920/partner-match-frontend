@@ -8,10 +8,10 @@ const route = useRoute();
 const router = useRouter();
 
 
-const checked = ref();
+const genderChecked = ref();
 const editUser = ref();
 /**
- * 借助生命周期钩子函数onMounted()初始化checked的值
+ * 借助生命周期钩子函数onMounted()初始化genderChecked的值
  */
 onMounted(() => {
   editUser.value = {
@@ -20,17 +20,17 @@ onMounted(() => {
     editName: route.query.editName,
     currentValue: route.query.currentValue,
   }
-  checked.value = <string>editUser.value.currentValue;
+  genderChecked.value = <string>editUser.value.currentValue;
 });
 
 const onSubmit = () => {
-  if (checked.value === null) {
+  if (genderChecked.value === null) {
     showToast("请选择性别");
     return;
   }
   myAxios.post('/user/update', {
     "id": editUser.value.userId,
-    [editUser.value.editKey]: <number>checked.value,
+    [editUser.value.editKey]: <number>genderChecked.value,
   }).then(response => {
     if (response.data > 0) {
       showToast("修改成功");
@@ -48,14 +48,14 @@ const onSubmit = () => {
 
 <template>
   <van-form @submit="onSubmit">
-    <van-radio-group v-model="checked">
+    <van-radio-group v-model="genderChecked">
       <van-cell-group>
-        <van-cell title="男" clickable @click="checked = '0'">
+        <van-cell title="男" clickable @click="genderChecked = '0'">
           <template #right-icon>
             <van-radio name='0'/>
           </template>
         </van-cell>
-        <van-cell title="女" clickable @click="checked = '1'">
+        <van-cell title="女" clickable @click="genderChecked = '1'">
           <template #right-icon>
             <van-radio name='1'/>
           </template>

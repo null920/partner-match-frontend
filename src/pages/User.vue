@@ -3,12 +3,13 @@ import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
 import myAxios from "../plugins/myAxios.ts";
 import {showNotify} from "vant/es";
+import 'vant/es/notify/style'
 
 const router = useRouter();
 
 const user = ref();
 
-onMounted(() => {
+onMounted(async () => {
   // 获取用户信息
   myAxios.get("/user/current")
       .then((response) => {

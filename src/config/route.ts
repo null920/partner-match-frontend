@@ -6,7 +6,7 @@ import UserEdit from "../pages/UserEdit.vue";
 import UserGenderEdit from "../pages/UserGenderEdit.vue";
 import SearchResult from "../pages/SearchResult.vue";
 import UserLogin from "../pages/UserLogin.vue";
-import JoinTeam from "../pages/JoinTeam.vue";
+import UpdateTeam from "../pages/UpdateTeam.vue";
 import AddTeam from "../pages/AddTeam.vue";
 
 
@@ -16,7 +16,7 @@ const routes = [
     {path: "/", name: "index", component: Index},
     {path: "/team", name: "team", component: Team},
     {path: "/team/add", name: "addTeam", component: AddTeam},
-    {path: "/team/join", name: "joinTeam", component: JoinTeam},
+    {path: "/team/update", name: "updateTeam", component: UpdateTeam},
     {path: "/user", name: "user", component: User},
     {path: "/search", name: "search", component: Search},
     {path: "/user/edit", name: "userEdit", component: UserEdit},

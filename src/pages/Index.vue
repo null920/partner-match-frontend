@@ -16,6 +16,7 @@ onMounted(async () => {
   }).then(function (response) {
     if (response?.data.length < 1) {
       showFailToast('没有找到匹配的用户');
+      console.log(response);
       return null;
     }
     // 处理成功情况
