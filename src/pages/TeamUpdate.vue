@@ -4,7 +4,6 @@ import myAxios from "../plugins/myAxios.ts";
 import {showNotify} from "vant";
 import 'vant/es/notify/style';
 import {useRoute, useRouter} from "vue-router";
-import {TeamType} from "../models/team";
 
 
 const router = useRouter();

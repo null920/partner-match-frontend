@@ -10,10 +10,12 @@ import {getCurrentUser} from "../services/user.ts";
 import {useRouter} from "vue-router";
 
 interface TeamCardListProps {
+  loading: boolean;
   teamList: TeamType[];
 }
 
 const props = withDefaults(defineProps<TeamCardListProps>(), {
+  loading: true,
   teamList: () => [],
 });
 
@@ -25,7 +27,7 @@ onMounted(async () => {
 })
 
 /**
- * 加入团队
+ * 加入队伍
  * @param id
  */
 const doJoinTeam = async (id: number) => {
@@ -40,9 +42,12 @@ const doJoinTeam = async (id: number) => {
     }
   }).catch(error => {
     console.log(error);
-  })
+  });
 }
-
+/**
+ * 更新队伍
+ * @param id
+ */
 const doUpdateTeam = (id: number) => {
   // 跳转到更新页面
   router.push({
@@ -51,6 +56,42 @@ const doUpdateTeam = (id: number) => {
       id,
     }
   })
+}
+/**
+ * 退出队伍
+ * @param id
+ */
+const doQuitTeam = async (id: number) => {
+  await myAxios.post("/team/quit", {
+    teamId: id,
+  }).then(res => {
+    if (res.code == 20000) {
+      showNotify({type: 'success', duration: 900, message: "退出成功"});
+    } else {
+      showNotify({type: 'warning', duration: 900, message: "退出失败" + (res.desc ? `,${res.desc}` : '')});
+      console.log(res);
+    }
+  }).catch(error => {
+    console.log(error);
+  });
+}
+/**
+ * 解散队伍
+ * @param id
+ */
+const doDeleteTeam = async (id: number) => {
+  await myAxios.post("/team/delete", {
+    teamId: id,
+  }).then(res => {
+    if (res.code == 20000) {
+      showNotify({type: 'success', duration: 900, message: "解散成功"});
+    } else {
+      showNotify({type: 'warning', duration: 900, message: "解散失败" + (res.desc ? `,${res.desc}` : '')});
+      console.log(res);
+    }
+  }).catch(error => {
+    console.log(error);
+  });
 }
 
 const formatTime = (time) => {
@@ -69,28 +110,39 @@ const formatTime = (time) => {
 </script>
 
 <template>
-  <van-card
-      v-for="team in props.teamList"
-      :desc="team.description"
-      :title="team.teamName"
-      :thumb="blg"
-  >
-    <template #tags>
-      <van-tag style="margin: 8px 10px 5px 0;" plain type="primary">{{ teamStatusEnum[team.status] }}
-      </van-tag>
-    </template>
-    <template #bottom>
-      <div>{{ "最大人数:" + team.maxNum }}</div>
-      <div>{{ "创建时间:" + formatTime(team.createTime) }}</div>
-      <div>{{ "过期时间:" + formatTime(team.expireTime) }}</div>
-    </template>
-    <template #footer>
-      <van-button size="small" type="primary" plain @click="doJoinTeam(team.id)">加入</van-button>
-      <van-button v-if="team.userId === currentUser?.id " size="small" type="default" plain
-                  @click="doUpdateTeam(team.id)">更新
-      </van-button>
-    </template>
-  </van-card>
+  <van-skeleton title avatar :row="3" :loading="props.loading" style="margin-top: 15px">
+    <van-card
+        v-for="team in props.teamList"
+        :desc="team.description"
+        :title="team.teamName"
+        :thumb="blg"
+    >
+      <template #tags>
+        <van-tag style="margin: 8px 10px 5px 0;" plain type="primary">{{ teamStatusEnum[team.status] }}
+        </van-tag>
+      </template>
+      <template #bottom>
+        <div>{{ "最大人数:" + team.maxNum }}</div>
+        <div>{{ "创建时间:" + formatTime(team.createTime) }}</div>
+        <div>{{ "过期时间:" + formatTime(team.expireTime) }}</div>
+      </template>
+      <template #footer>
+        <van-button v-if="team.userId !== currentUser?.id && !team.hasJoin" size="small" type="primary" plain
+                    @click="doJoinTeam(team.id)">加入
+        </van-button>
+        <van-button v-if="team.userId === currentUser?.id " size="small" color="#7232dd" plain
+                    @click="doUpdateTeam(team.id)">更新
+        </van-button>
+        <van-button v-if="team.hasJoin" size="small" type="warning" plain
+                    @click="doQuitTeam(team.id)">退出
+        </van-button>
+        <van-button v-if="team.userId === currentUser?.id" size="small" type="danger" plain
+                    @click="doDeleteTeam(team.id)">
+          解散
+        </van-button>
+      </template>
+    </van-card>
+  </van-skeleton>
 </template>
 
 <style scoped>
