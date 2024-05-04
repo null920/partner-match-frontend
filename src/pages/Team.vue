@@ -4,19 +4,22 @@ import {useRouter} from 'vue-router';
 import TeamCardList from "../components/TeamCardList.vue";
 import myAxios from "../plugins/myAxios.ts";
 import {showNotify} from "vant";
+import {getCurrentUser} from "../services/user.ts";
 
 const router = useRouter();
 const teamList = ref([]);
 const searchText = ref("");
 const loading = ref(true);
+const loginUser = ref();
 
 onMounted(async () => {
+  loginUser.value = await getCurrentUser();
   loading.value = true;
   // 获取队伍列表
   await myAxios.get("/team/list")
       .then(res => {
         if (res.code === 20000) {
-          showNotify({type: 'success', duration: 900, message: '获取成功'});
+          //showNotify({type: 'success', duration: 900, message: '获取成功'});
           teamList.value = res.data;
         } else {
           showNotify({type: 'warning', duration: 900, message: '获取失败'});
@@ -62,7 +65,7 @@ const onSearch = async (val) => {
 
 </script>
 <template>
-  <div id="teamPage">
+  <div v-if="loginUser" id="teamPage">
     <van-search clearable clear-trigger="focus" v-model="searchText" placeholder="请输入搜索关键词"
                 @search="onSearch"/>
     <van-button type="primary" @click="addTeam" block>创建队伍</van-button>

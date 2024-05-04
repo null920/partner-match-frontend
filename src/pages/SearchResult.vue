@@ -9,7 +9,12 @@ import UserCardList from "../components/UserCardList.vue";
 const route = useRoute();
 const {tags} = route.query;
 const userList = ref([]);
+const loading = ref(true);
+const searchFlag = ref(false);
+
 onMounted(async () => {
+  searchFlag.value = true;
+  loading.value = true;
   // 向后端请求数据
   const userListData = await myAxios.get('/user/search/tags', {
     params: {
@@ -39,13 +44,21 @@ onMounted(async () => {
     });
     userList.value = userListData;
   }
+  searchFlag.value = false;
+  loading.value = false;
 });
 
 </script>
 
 <template>
-  <user-card-list :user-list="userList"/>
-  <van-empty v-if="!userList || userList.length < 1" image="error" description="没有找到匹配的用户"/>
+  <van-loading v-show="searchFlag" vertical>
+    <template #icon>
+      <van-icon name="star-o" size="30"/>
+    </template>
+    搜索中...
+  </van-loading>
+  <user-card-list :user-list="userList" :loading="loading"/>
+  <van-empty v-if="!loading && (!userList || userList.length < 1)" image="error" description="没有找到匹配的用户"/>
 </template>
 
 <style scoped>

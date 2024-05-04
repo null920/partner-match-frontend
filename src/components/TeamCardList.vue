@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import 'vant/es/notify/style';
+import 'vant/es/dialog/style';
 import {TeamType} from "../models/team";
 import {teamStatusEnum} from "../constants/team.ts";
 import blg from "../assets/blg.jpeg";
 import myAxios from "../plugins/myAxios.ts";
-import {showNotify} from "vant";
+import {showConfirmDialog, showDialog, showNotify} from "vant";
 import {onMounted, ref} from "vue";
-import 'vant/es/notify/style';
 import {getCurrentUser} from "../services/user.ts";
 import {useRouter} from "vue-router";
 
@@ -30,20 +31,34 @@ onMounted(async () => {
  * 加入队伍
  * @param id
  */
-const doJoinTeam = async (id: number) => {
-  await myAxios.post("/team/join", {
-    teamId: id,
-  }).then(res => {
-    if (res.code == 20000) {
-      showNotify({type: 'success', duration: 900, message: "加入成功"});
-    } else {
-      showNotify({type: 'warning', duration: 900, message: "加入失败" + (res.desc ? `,${res.desc}` : '')});
-      console.log(res);
-    }
-  }).catch(error => {
-    console.log(error);
+const doJoinTeam = (id: number) => {
+  showDialog({
+    overlay: true,
+    showCancelButton: true,
+    message:
+        '确认加入该队伍吗？',
+    theme: 'round-button',
+  }).then(async () => {
+    // on confirm
+    await myAxios.post("/team/join", {
+      teamId: id,
+    }).then(res => {
+      if (res.code == 20000) {
+        showNotify({type: 'success', duration: 900, message: "加入成功"});
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        showNotify({type: 'warning', duration: 900, message: "加入失败" + (res.desc ? `,${res.desc}` : '')});
+        console.log(res);
+      }
+    }).catch(error => {
+      console.log(error);
+    });
+  }).catch(() => {
   });
 }
+
 /**
  * 更新队伍
  * @param id
@@ -62,17 +77,29 @@ const doUpdateTeam = (id: number) => {
  * @param id
  */
 const doQuitTeam = async (id: number) => {
-  await myAxios.post("/team/quit", {
-    teamId: id,
-  }).then(res => {
-    if (res.code == 20000) {
-      showNotify({type: 'success', duration: 900, message: "退出成功"});
-    } else {
-      showNotify({type: 'warning', duration: 900, message: "退出失败" + (res.desc ? `,${res.desc}` : '')});
-      console.log(res);
-    }
-  }).catch(error => {
-    console.log(error);
+  showDialog({
+    overlay: true,
+    showCancelButton: true,
+    message:
+        '确认退出该队伍吗？',
+    theme: 'round-button',
+  }).then(async () => {
+    await myAxios.post("/team/quit", {
+      teamId: id,
+    }).then(res => {
+      if (res.code == 20000) {
+        showNotify({type: 'success', duration: 900, message: "退出成功"});
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        showNotify({type: 'warning', duration: 900, message: "退出失败" + (res.desc ? `,${res.desc}` : '')});
+        console.log(res);
+      }
+    }).catch(error => {
+      console.log(error);
+    });
+  }).catch(() => {
   });
 }
 /**
@@ -80,18 +107,31 @@ const doQuitTeam = async (id: number) => {
  * @param id
  */
 const doDeleteTeam = async (id: number) => {
-  await myAxios.post("/team/delete", {
-    teamId: id,
-  }).then(res => {
-    if (res.code == 20000) {
-      showNotify({type: 'success', duration: 900, message: "解散成功"});
-    } else {
-      showNotify({type: 'warning', duration: 900, message: "解散失败" + (res.desc ? `,${res.desc}` : '')});
-      console.log(res);
-    }
-  }).catch(error => {
-    console.log(error);
+  showDialog({
+    overlay: true,
+    showCancelButton: true,
+    message:
+        '确认解散该队伍吗？',
+    theme: 'round-button',
+  }).then(async () => {
+    await myAxios.post("/team/delete", {
+      teamId: id,
+    }).then(res => {
+      if (res.code == 20000) {
+        showNotify({type: 'success', duration: 900, message: "解散成功"});
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        showNotify({type: 'warning', duration: 900, message: "解散失败" + (res.desc ? `,${res.desc}` : '')});
+        console.log(res);
+      }
+    }).catch(error => {
+      console.log(error);
+    });
+  }).catch(() => {
   });
+
 }
 
 const formatTime = (time) => {
@@ -137,8 +177,7 @@ const formatTime = (time) => {
                     @click="doQuitTeam(team.id)">退出
         </van-button>
         <van-button v-if="team.userId === currentUser?.id" size="small" type="danger" plain
-                    @click="doDeleteTeam(team.id)">
-          解散
+                    @click="doDeleteTeam(team.id)">解散
         </van-button>
       </template>
     </van-card>
