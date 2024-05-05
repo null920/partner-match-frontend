@@ -5,7 +5,7 @@ import {TeamType} from "../models/team";
 import {teamStatusEnum} from "../constants/team.ts";
 import blg from "../assets/blg.jpeg";
 import myAxios from "../plugins/myAxios.ts";
-import {showConfirmDialog, showDialog, showNotify} from "vant";
+import {showDialog, showNotify} from "vant";
 import {onMounted, ref} from "vue";
 import {getCurrentUser} from "../services/user.ts";
 import {useRouter} from "vue-router";
@@ -22,6 +22,9 @@ const props = withDefaults(defineProps<TeamCardListProps>(), {
 
 const currentUser = ref();
 const router = useRouter();
+const password = ref('');
+const joinTeamId = ref();
+const showPasswordDialog = ref(false);
 
 onMounted(async () => {
   currentUser.value = await getCurrentUser();
@@ -31,32 +34,58 @@ onMounted(async () => {
  * 加入队伍
  * @param id
  */
-const doJoinTeam = (id: number) => {
-  showDialog({
-    overlay: true,
-    showCancelButton: true,
-    message:
-        '确认加入该队伍吗？',
-    theme: 'round-button',
-  }).then(async () => {
-    // on confirm
-    await myAxios.post("/team/join", {
-      teamId: id,
-    }).then(res => {
-      if (res.code == 20000) {
-        showNotify({type: 'success', duration: 900, message: "加入成功"});
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
-      } else {
-        showNotify({type: 'warning', duration: 900, message: "加入失败" + (res.desc ? `,${res.desc}` : '')});
-        console.log(res);
-      }
-    }).catch(error => {
-      console.log(error);
+const doJoinTeam = (id: number, status: number) => {
+  if (status === 2) {
+    joinTeamId.value = id;
+    showPasswordDialog.value = true;
+  } else {
+    showDialog({
+      overlay: true,
+      showCancelButton: true,
+      message:
+          '确认加入该队伍吗？',
+      theme: 'round-button',
+    }).then(async () => {
+      // on confirm
+      await myAxios.post("/team/join", {
+        teamId: id,
+      }).then(res => {
+        if (res?.code == 20000) {
+          showNotify({type: 'success', duration: 900, message: "加入成功"});
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          showNotify({type: 'warning', duration: 900, message: "加入失败" + (res?.desc ? `,${res?.desc}` : '')});
+          console.log(res);
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    }).catch(() => {
     });
-  }).catch(() => {
+  }
+}
+
+// 加入加密队伍
+const doJoinPasswordTeam = async (password: string) => {
+  await myAxios.post("/team/join", {
+    teamId: joinTeamId.value,
+    password,
+  }).then(res => {
+    if (res?.code == 20000) {
+      showNotify({type: 'success', duration: 900, message: "加入成功"});
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    } else {
+      showNotify({type: 'warning', duration: 900, message: "加入失败" + (res?.desc ? `,${res?.desc}` : '')});
+      console.log(res);
+    }
+  }).catch(error => {
+    console.log(error);
   });
+
 }
 
 /**
@@ -158,7 +187,8 @@ const formatTime = (time) => {
         :thumb="blg"
     >
       <template #tags>
-        <van-tag style="margin: 8px 10px 5px 0;" plain type="primary">{{ teamStatusEnum[team.status] }}
+        <van-tag style="margin: 8px 10px 5px 0;" plain :type="team.status===0?'primary':'danger'">
+          {{ teamStatusEnum[team.status] }}
         </van-tag>
       </template>
       <template #bottom>
@@ -168,7 +198,7 @@ const formatTime = (time) => {
       </template>
       <template #footer>
         <van-button v-if="team.userId !== currentUser?.id && !team.hasJoin" size="small" type="primary" plain
-                    @click="doJoinTeam(team.id)">加入
+                    @click="doJoinTeam(team.id,team.status)">加入
         </van-button>
         <van-button v-if="team.userId === currentUser?.id " size="small" color="#7232dd" plain
                     @click="doUpdateTeam(team.id)">更新
@@ -182,6 +212,16 @@ const formatTime = (time) => {
       </template>
     </van-card>
   </van-skeleton>
+  <van-dialog v-model:show="showPasswordDialog" title="请输入密码" show-cancel-button
+              @confirm="doJoinPasswordTeam(password)" @cancel="password=''">
+    <van-field
+        v-model="password"
+        type="password"
+        name="password"
+        placeholder="密码"
+        :rules="[{ required: true, message: '请填写密码' }]"
+    />
+  </van-dialog>
 </template>
 
 <style scoped>

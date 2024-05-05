@@ -37,7 +37,6 @@ const onClickRight = () => {
       <van-icon name="search" size="18"/>
     </template>
   </van-nav-bar>
-
   <div id="content">
     <router-view/>
   </div>
