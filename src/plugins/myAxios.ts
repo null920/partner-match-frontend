@@ -3,7 +3,7 @@ import {showNotify} from "vant/es";
 
 //Create a new instance of axios with a base URL and custom headers
 const myAxios = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: 'https://match-end.null920.top/api',
     withCredentials: true,
 });
 

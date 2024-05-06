@@ -5,7 +5,7 @@ import {TeamType} from "../models/team";
 import {teamStatusEnum} from "../constants/team.ts";
 import blg from "../assets/blg.jpeg";
 import myAxios from "../plugins/myAxios.ts";
-import {showDialog, showNotify} from "vant";
+import {showDialog, showNotify, showToast} from "vant";
 import {onMounted, ref} from "vue";
 import {getCurrentUser} from "../services/user.ts";
 import {useRouter} from "vue-router";
@@ -68,13 +68,20 @@ const doJoinTeam = (id: number, status: number) => {
 }
 
 // 加入加密队伍
-const doJoinPasswordTeam = async (password: string) => {
+const doJoinPasswordTeam = async () => {
+  if (password.value === '') {
+    //提示用户选择标签
+    showToast('请填写密码');
+    return;
+  }
   await myAxios.post("/team/join", {
     teamId: joinTeamId.value,
-    password,
+    password: password.value,
   }).then(res => {
     if (res?.code == 20000) {
       showNotify({type: 'success', duration: 900, message: "加入成功"});
+      joinTeamId.value = 0;
+      password.value = '';
       setTimeout(() => {
         location.reload();
       }, 1000);
@@ -192,7 +199,7 @@ const formatTime = (time) => {
         </van-tag>
       </template>
       <template #bottom>
-        <div>{{ "最大人数:" + team.maxNum }}</div>
+        <div>{{ `队伍人数:${team.teamMemberNum}/${team.maxNum}` }}</div>
         <div>{{ "创建时间:" + formatTime(team.createTime) }}</div>
         <div>{{ "过期时间:" + formatTime(team.expireTime) }}</div>
       </template>
@@ -213,7 +220,7 @@ const formatTime = (time) => {
     </van-card>
   </van-skeleton>
   <van-dialog v-model:show="showPasswordDialog" title="请输入密码" show-cancel-button
-              @confirm="doJoinPasswordTeam(password)" @cancel="password=''">
+              @confirm="doJoinPasswordTeam" @cancel="password=''">
     <van-field
         v-model="password"
         type="password"
