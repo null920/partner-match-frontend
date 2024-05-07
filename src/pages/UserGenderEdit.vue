@@ -2,7 +2,7 @@
 import {useRoute, useRouter} from "vue-router";
 import {ref, onMounted} from "vue";
 import {showToast} from "vant/es"
-import myAxios from "../plugins/myAxios.ts";
+import userAxios from "../plugins/userAxios.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -28,7 +28,7 @@ const onSubmit = () => {
     showToast("请选择性别");
     return;
   }
-  myAxios.post('/user/update', {
+  userAxios.post('/user/update', {
     "id": editUser.value.userId,
     [editUser.value.editKey]: <number>genderChecked.value,
   }).then(response => {

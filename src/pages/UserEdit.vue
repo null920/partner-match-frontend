@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {useRoute, useRouter} from "vue-router";
 import {ref} from "vue";
-import myAxios from "../plugins/myAxios.ts";
 import {showFailToast, showSuccessToast} from "vant/es";
+import userAxios from "../plugins/userAxios.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -33,7 +33,7 @@ switch (editUser.value.editKey) {
 }
 
 const onSubmit = () => {
-  myAxios.post('/user/update', {
+  userAxios.post('/user/update', {
     "id": editUser.value.userId,
     [editUser.value.editKey]: editUser.value.currentValue,
   },).then(function (response) {

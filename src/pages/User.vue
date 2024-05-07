@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
-import myAxios from "../plugins/myAxios.ts";
 import {showNotify} from "vant/es";
 import 'vant/es/notify/style'
 import {getCurrentUser} from "../services/user.ts";
+import userAxios from "../plugins/userAxios.ts";
 
 const router = useRouter();
 
@@ -16,7 +16,7 @@ onMounted(async () => {
 });
 
 const doLogout = () => {
-  myAxios.post("/user/logout")
+  userAxios.post("/user/logout")
       .then((res) => {
             if (res?.data > 0) {
               showNotify({type: 'success', message: '退出登录成功', duration: 900});

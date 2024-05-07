@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue';
-import myAxios from "../plugins/myAxios.ts";
+import teamAxios from "../plugins/teamAxios.ts";
 import {showNotify} from "vant";
 import 'vant/es/notify/style';
 import {useRoute, useRouter} from "vue-router";
@@ -21,7 +21,7 @@ onMounted(async () => {
   if (id == null || id <= 0) {
     showNotify({type: 'danger', duration: 900, message: "加载队伍失败"});
   }
-  await myAxios.get("/team/get", {
+  await teamAxios.get("/team/get", {
     params: {
       id,
     }
@@ -61,7 +61,7 @@ const onCancel = () => {
 
 const onSubmit = async () => {
   const postData = {...addTeamData.value, status: Number(statusChecked.value)};
-  await myAxios.post('/team/update', postData)
+  await teamAxios.post('/team/update', postData)
       .then(res => {
         if (res?.code === 20000) {
           showNotify({type: 'success', duration: 900, message: '更新成功'});

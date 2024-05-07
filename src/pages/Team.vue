@@ -2,7 +2,7 @@
 import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import TeamCardList from "../components/TeamCardList.vue";
-import myAxios from "../plugins/myAxios.ts";
+import teamAxios from "../plugins/teamAxios.ts";
 import {showNotify} from "vant";
 import {getCurrentUser} from "../services/user.ts";
 
@@ -34,7 +34,7 @@ const onTabChange = (name) => {
 const listTeam = async (val = '', status = 0) => {
   loading.value = true;
   // 获取队伍列表
-  await myAxios.get("/team/list", {
+  await teamAxios.get("/team/list", {
     params: {
       searchText: val,
       status,

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import {onMounted, ref} from "vue";
-import myAxios from "../plugins/myAxios.ts";
+import teamAxios from "../plugins/teamAxios.ts";
 import {showNotify} from "vant/es";
 import 'vant/es/notify/style'
 
@@ -11,7 +11,7 @@ const user = ref();
 
 onMounted(async () => {
   // 获取用户信息
-  await myAxios.get("/user/current")
+  await teamAxios.get("/user/current")
       .then((response) => {
         if (response.data) {
           // 保存用户信息

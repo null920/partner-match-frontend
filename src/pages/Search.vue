@@ -55,7 +55,7 @@ const onSearch = () => {
         const tempChildren = [...parentTag.children];
         tempParentTag.children = tempChildren.filter(item => item.text.includes(searchText.value));
         return tempParentTag;
-      }).filter(item => item.children != null && item.children.length > 0);
+      }).filter(item => item.children.length > 0);
   activeIndex.value = 0;
 };
 
@@ -103,7 +103,7 @@ const doSearchResult = () => {
 <template>
   <form action="/">
     <van-search v-model="searchText" clearable show-action placeholder="请输入要搜索的标签" @search="onSearch"
-                @cancel="onCancel" @clear="recoverTagList"/>
+                @cancel="onCancel" @clear="recoverTagList" @click-input="recoverTagList"/>
   </form>
   <van-divider style=" margin: 0 ">已选标签</van-divider>
   <van-button style="margin-bottom: 8px;margin-left: 320px;" type="default" size="mini" icon="cross"

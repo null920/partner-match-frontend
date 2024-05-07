@@ -4,7 +4,7 @@ import 'vant/es/dialog/style';
 import {TeamType} from "../models/team";
 import {teamStatusEnum} from "../constants/team.ts";
 import blg from "../assets/blg.jpeg";
-import myAxios from "../plugins/myAxios.ts";
+import teamAxios from "../plugins/teamAxios.ts";
 import {showDialog, showNotify, showToast} from "vant";
 import {onMounted, ref} from "vue";
 import {getCurrentUser} from "../services/user.ts";
@@ -47,7 +47,7 @@ const doJoinTeam = (id: number, status: number) => {
       theme: 'round-button',
     }).then(async () => {
       // on confirm
-      await myAxios.post("/team/join", {
+      await teamAxios.post("/team/join", {
         teamId: id,
       }).then(res => {
         if (res?.code == 20000) {
@@ -74,7 +74,7 @@ const doJoinPasswordTeam = async () => {
     showToast('请填写密码');
     return;
   }
-  await myAxios.post("/team/join", {
+  await teamAxios.post("/team/join", {
     teamId: joinTeamId.value,
     password: password.value,
   }).then(res => {
@@ -120,7 +120,7 @@ const doQuitTeam = async (id: number) => {
         '确认退出该队伍吗？',
     theme: 'round-button',
   }).then(async () => {
-    await myAxios.post("/team/quit", {
+    await teamAxios.post("/team/quit", {
       teamId: id,
     }).then(res => {
       if (res.code == 20000) {
@@ -150,7 +150,7 @@ const doDeleteTeam = async (id: number) => {
         '确认解散该队伍吗？',
     theme: 'round-button',
   }).then(async () => {
-    await myAxios.post("/team/delete", {
+    await teamAxios.post("/team/delete", {
       teamId: id,
     }).then(res => {
       if (res.code == 20000) {

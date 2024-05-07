@@ -2,7 +2,7 @@
 import {onMounted, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import TeamCardList from "../components/TeamCardList.vue";
-import myAxios from "../plugins/myAxios.ts";
+import teamAxios from "../plugins/teamAxios.ts";
 import {showNotify} from "vant";
 
 const router = useRouter();
@@ -13,7 +13,7 @@ const loading = ref(true);
 onMounted(async () => {
   loading.value = true;
   // 获取队伍列表
-  await myAxios.get("/team/list/my/join")
+  await teamAxios.get("/team/list/my/join")
       .then(res => {
         if (res.code === 20000) {
           //showNotify({type: 'success', duration: 900, message: '获取成功'});
@@ -31,7 +31,7 @@ onMounted(async () => {
 
 const onSearch = async (val) => {
   loading.value = true;
-  await myAxios.get("/team/list", {
+  await teamAxios.get("/team/list", {
     params: {
       searchText: val,
       pageNum: 1,

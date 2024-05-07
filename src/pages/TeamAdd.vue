@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import myAxios from "../plugins/myAxios.ts";
+import teamAxios from "../plugins/teamAxios.ts";
 import {showNotify} from "vant";
 import 'vant/es/notify/style';
 import {useRouter} from "vue-router";
@@ -34,7 +34,7 @@ const onCancel = () => {
 };
 const onSubmit = async () => {
   const postData = {...addTeamData.value, status: Number(statusChecked.value)};
-  await myAxios.post('/team/add', postData)
+  await teamAxios.post('/team/add', postData)
       .then(res => {
         if (res?.code === 20000) {
           // 提交成功

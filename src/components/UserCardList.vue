@@ -41,7 +41,7 @@ const copyPhone = (phone: string) => {
         :thumb="user.avatarUrl"
     >
       <template #tags>
-        <van-tag style="margin: 8px 10px 5px 0;" plain type="primary" v-for="tag in user.tags">{{ tag }}
+        <van-tag style="margin: 8px 8px 5px 0;" plain type="primary" v-for="tag in user.tags">{{ tag }}
         </van-tag>
       </template>
       <template #footer>

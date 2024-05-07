@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import {ref} from 'vue';
-import myAxios from "../plugins/myAxios.ts";
 import {showFailToast, showSuccessToast} from "vant/es";
-import {useRoute, useRouter} from "vue-router";
+import {useRoute} from "vue-router";
+import userAxios from "../plugins/userAxios.ts";
 
-const router = useRouter();
 const route = useRoute();
 
 const userAccount = ref('');
 const userPassword = ref('');
 const onSubmit = () => {
-  myAxios.post("/user/login", {
+  userAxios.post("/user/login", {
     userAccount: userAccount.value,
     userPassword: userPassword.value,
   }).then((response) => {
@@ -49,6 +48,7 @@ const onSubmit = () => {
           :rules="[{ required: true, message: '请填写密码' }]"
       />
     </van-cell-group>
+    <van-cell title="" url="https://user.null920.top/user/register" value="还没有账号？点击注册"></van-cell>
     <div style="margin: 16px;">
       <van-button round block type="primary" native-type="submit">
         提交
