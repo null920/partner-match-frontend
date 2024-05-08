@@ -5,6 +5,7 @@ import teamAxios from "../plugins/teamAxios.ts";
 import {showFailToast, showSuccessToast} from "vant/es";
 import qs from "qs";
 import UserCardList from "../components/UserCardList.vue";
+import userAxios from "../plugins/userAxios.ts";
 
 const route = useRoute();
 const {tags} = route.query;
@@ -16,7 +17,7 @@ onMounted(async () => {
   searchFlag.value = true;
   loading.value = true;
   // 向后端请求数据
-  const userListData = await teamAxios.get('/user/search/tags', {
+  const userListData = await userAxios.get('/user/search/tags', {
     params: {
       tagNameList: tags
     },
